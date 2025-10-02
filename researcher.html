@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>EXO Planet Finder - Researcher</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: #f4f6f9;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .sidebar {
+      width: 250px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      background: #212529;
+      color: white;
+      padding: 15px;
+      overflow-y: auto;
+    }
+
+    .sidebar h4 {
+      margin-bottom: 20px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .sidebar .nav-link {
+      color: #ddd;
+      margin: 5px 0;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+
+    .sidebar .nav-link:hover {
+      background: #495057;
+      color: #fff;
+    }
+
+    .main {
+      margin-left: 250px;
+      padding: 20px;
+    }
+
+    .navbar-custom {
+      background: #fff;
+      border-bottom: 1px solid #ddd;
+      padding: 10px 20px;
+    }
+
+    .card-box {
+      background: #fff;
+      border-radius: 15px;
+      padding: 20px;
+      margin-top: 20px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .tab-content {
+      margin-top: 20px;
+    }
+
+    .form-control {
+      border-radius: 10px;
+    }
+
+    #resultBox {
+      white-space: pre-wrap;
+      background: #f8f9fa;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 15px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    button {
+      border-radius: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h4>🚀 EXO Finder</h4>
+    <ul class="nav flex-column">
+      <li class="nav-item"><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+      <li class="nav-item"><a href="citizen.html" class="nav-link">Citizen Scientist</a></li>
+      <li class="nav-item"><a href="researcher.html" class="nav-link active">Researcher</a></li>
+      <li class="nav-item"><a href="password-update.html" class="nav-link">Password Update</a></li>
+      <li class="nav-item"><a href="#" class="nav-link text-danger" onclick="logout()">Logout</a></li>
+    </ul>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <!-- Navbar -->
+    <nav class="navbar navbar-custom d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">EXO Planet Finder - Researcher</h5>
+      <div>
+        <span id="navbar-username" class="me-3 text-muted"></span>
+        <button class="btn btn-sm btn-outline-danger" onclick="logout()">Logout</button>
+      </div>
+    </nav>
+
+    <!-- Content -->
+    <div class="container-fluid">
+      <div class="card-box">
+        <ul class="nav nav-tabs" id="researcherTabs">
+          <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#inputJson">Input JSON</a></li>
+          <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#uploadCsv">Upload CSV</a></li>
+          <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#trainModel">Train AI Model</a></li>
+        </ul>
+
+        <div class="tab-content">
+          <!-- Input JSON -->
+          <div class="tab-pane fade show active" id="inputJson">
+            <h5 class="mt-3">📥 KOI Parameters</h5>
+            <form id="jsonForm" class="row g-2">
+              <!-- সব KOI ফিল্ড -->
+              <div class="col-md-3"><label>koi_period</label><input type="number" step="0.01" name="koi_period"
+                  class="form-control" value="10.5"></div>
+              <div class="col-md-3"><label>koi_prad</label><input type="number" step="0.01" name="koi_prad"
+                  class="form-control" value="2.3"></div>
+              <div class="col-md-3"><label>koi_depth</label><input type="number" step="0.01" name="koi_depth"
+                  class="form-control" value="500"></div>
+              <div class="col-md-3"><label>koi_impact</label><input type="number" step="0.01" name="koi_impact"
+                  class="form-control" value="0.5"></div>
+              <div class="col-md-3"><label>koi_duration</label><input type="number" step="0.01" name="koi_duration"
+                  class="form-control" value="3.2"></div>
+              <div class="col-md-3"><label>koi_teq</label><input type="number" step="1" name="koi_teq"
+                  class="form-control" value="1200"></div>
+              <div class="col-md-3"><label>koi_insol</label><input type="number" step="0.1" name="koi_insol"
+                  class="form-control" value="45.2"></div>
+              <div class="col-md-3"><label>koi_steff</label><input type="number" step="1" name="koi_steff"
+                  class="form-control" value="5500"></div>
+              <div class="col-md-3"><label>koi_slogg</label><input type="number" step="0.1" name="koi_slogg"
+                  class="form-control" value="4.4"></div>
+              <div class="col-md-3"><label>koi_srad</label><input type="number" step="0.1" name="koi_srad"
+                  class="form-control" value="1.1"></div>
+              <div class="col-md-3"><label>koi_kepmag</label><input type="number" step="0.1" name="koi_kepmag"
+                  class="form-control" value="12.5"></div>
+              <div class="col-md-3"><label>ra</label><input type="number" step="0.01" name="ra" class="form-control"
+                  value="285.67"></div>
+              <div class="col-md-3"><label>dec</label><input type="number" step="0.01" name="dec" class="form-control"
+                  value="42.45"></div>
+              <div class="col-md-3"><label>koi_model_snr</label><input type="number" step="0.1" name="koi_model_snr"
+                  class="form-control" value="15.2"></div>
+              <div class="col-md-3"><label>koi_score</label><input type="number" step="0.01" name="koi_score"
+                  class="form-control" value="0.85"></div>
+              <div class="col-md-3"><label>koi_fpflag_nt</label><input type="number" name="koi_fpflag_nt"
+                  class="form-control" value="0"></div>
+              <div class="col-md-3"><label>koi_fpflag_ss</label><input type="number" name="koi_fpflag_ss"
+                  class="form-control" value="0"></div>
+              <div class="col-md-3"><label>koi_fpflag_co</label><input type="number" name="koi_fpflag_co"
+                  class="form-control" value="0"></div>
+              <div class="col-md-3"><label>koi_fpflag_ec</label><input type="number" name="koi_fpflag_ec"
+                  class="form-control" value="0"></div>
+              <div class="col-md-3"><label>koi_tce_plnt_num</label><input type="number" name="koi_tce_plnt_num"
+                  class="form-control" value="1"></div>
+              <div class="col-md-3"><label>koi_period_err1</label><input type="number" step="0.0001"
+                  name="koi_period_err1" class="form-control" value="0.001"></div>
+              <div class="col-md-3"><label>koi_period_err2</label><input type="number" step="0.0001"
+                  name="koi_period_err2" class="form-control" value="-0.001"></div>
+              <div class="col-md-3"><label>koi_time0bk</label><input type="number" step="0.01" name="koi_time0bk"
+                  class="form-control" value="131.45"></div>
+              <div class="col-md-3"><label>koi_time0bk_err1</label><input type="number" step="0.001"
+                  name="koi_time0bk_err1" class="form-control" value="0.005"></div>
+              <div class="col-md-3"><label>koi_time0bk_err2</label><input type="number" step="0.001"
+                  name="koi_time0bk_err2" class="form-control" value="-0.005"></div>
+              <div class="col-md-3"><label>koi_impact_err1</label><input type="number" step="0.1" name="koi_impact_err1"
+                  class="form-control" value="0.1"></div>
+              <div class="col-md-3"><label>koi_impact_err2</label><input type="number" step="0.1" name="koi_impact_err2"
+                  class="form-control" value="-0.1"></div>
+              <div class="col-md-3"><label>koi_duration_err1</label><input type="number" step="0.1"
+                  name="koi_duration_err1" class="form-control" value="0.2"></div>
+              <div class="col-md-3"><label>koi_duration_err2</label><input type="number" step="0.1"
+                  name="koi_duration_err2" class="form-control" value="-0.2"></div>
+              <div class="col-md-3"><label>koi_depth_err1</label><input type="number" name="koi_depth_err1"
+                  class="form-control" value="50"></div>
+              <div class="col-md-3"><label>koi_depth_err2</label><input type="number" name="koi_depth_err2"
+                  class="form-control" value="-50"></div>
+              <div class="col-md-3"><label>koi_prad_err1</label><input type="number" step="0.1" name="koi_prad_err1"
+                  class="form-control" value="0.3"></div>
+              <div class="col-md-3"><label>koi_prad_err2</label><input type="number" step="0.1" name="koi_prad_err2"
+                  class="form-control" value="-0.3"></div>
+              <div class="col-md-3"><label>koi_insol_err1</label><input type="number" name="koi_insol_err1"
+                  class="form-control" value="5"></div>
+              <div class="col-md-3"><label>koi_insol_err2</label><input type="number" name="koi_insol_err2"
+                  class="form-control" value="-5"></div>
+              <div class="col-md-3"><label>koi_steff_err1</label><input type="number" name="koi_steff_err1"
+                  class="form-control" value="100"></div>
+              <div class="col-md-3"><label>koi_steff_err2</label><input type="number" name="koi_steff_err2"
+                  class="form-control" value="-100"></div>
+              <div class="col-md-3"><label>koi_slogg_err1</label><input type="number" step="0.1" name="koi_slogg_err1"
+                  class="form-control" value="0.1"></div>
+              <div class="col-md-3"><label>koi_slogg_err2</label><input type="number" step="0.1" name="koi_slogg_err2"
+                  class="form-control" value="-0.1"></div>
+              <div class="col-md-3"><label>koi_srad_err1</label><input type="number" step="0.01" name="koi_srad_err1"
+                  class="form-control" value="0.05"></div>
+              <div class="col-md-3"><label>koi_srad_err2</label><input type="number" step="0.01" name="koi_srad_err2"
+                  class="form-control" value="-0.05"></div>
+              <div class="col-12"><button type="submit" class="btn btn-primary mt-2">Submit</button></div>
+            </form>
+            <div id="resultBox"></div>
+          </div>
+
+          <!-- Upload CSV -->
+          <div class="tab-pane fade" id="uploadCsv">
+            <h5 class="mt-3">📂 Upload CSV</h5>
+            <form id="uploadForm" class="d-flex mt-2">
+              <input type="file" id="csvFile" class="form-control me-2" accept=".csv" required>
+              <button type="submit" class="btn btn-warning">Upload</button>
+            </form>
+            <div id="uploadMsg" class="mt-2"></div>
+          </div>
+
+          <!-- Train AI Model -->
+          <div class="tab-pane fade" id="trainModel">
+            <h5 class="mt-3">🧠 Train AI Model</h5>
+            <form id="trainForm" enctype="multipart/form-data">
+              <div class="mb-3">
+                <label class="form-label">Upload CSV File</label>
+                <input type="file" id="trainFile" class="form-control" accept=".csv" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Learning Rate</label>
+                <input type="number" step="0.001" id="learning_rate" class="form-control" value="0.01" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">n_estimators</label>
+                <input type="number" id="n_estimators" class="form-control" value="100" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Test Size</label>
+                <input type="number" step="0.01" id="test_size" class="form-control" value="0.2" required>
+              </div>
+              <button type="submit" class="btn btn-success">🚀 Train</button>
+            </form>
+            <div id="trainMsg" class="mt-2"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) window.location.href = "index.html";
+    document.getElementById("navbar-username").innerText = user.name;
+
+    const API_BASE = "http://localhost:5000/researcher";
+
+    // Input JSON
+    document.getElementById("jsonForm").onsubmit = async (e) => {
+      e.preventDefault();
+      const formData = Object.fromEntries(new FormData(e.target).entries());
+      try {
+        const res = await fetch(`${API_BASE}/input`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": localStorage.getItem("token") },
+          body: JSON.stringify(formData)
+        });
+        const data = await res.json();
+        document.getElementById("resultBox").innerText = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById("resultBox").innerText = "❌ Server Error";
+      }
+    };
+
+    // Upload CSV
+    document.getElementById("uploadForm").onsubmit = async (e) => {
+      e.preventDefault();
+      const file = document.getElementById("csvFile").files[0];
+      const formData = new FormData(); formData.append("file", file);
+      try {
+        const res = await fetch(`${API_BASE}/upload`, { method: "POST", headers: { "Authorization": localStorage.getItem("token") }, body: formData });
+        if (!res.ok) throw new Error();
+        const blob = await res.blob(); const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a"); a.href = url; a.download = "result.csv"; a.click();
+        document.getElementById("uploadMsg").innerHTML = `<div class="alert alert-success">✅ File processed successfully</div>`;
+      } catch (err) {
+        document.getElementById("uploadMsg").innerHTML = `<div class="alert alert-danger">❌ Upload failed</div>`;
+      }
+    };
+
+    // Train AI Model
+    document.getElementById("trainForm").onsubmit = async (e) => {
+      e.preventDefault();
+      const formData = new FormData();
+      formData.append("file", document.getElementById("trainFile").files[0]);
+      formData.append("learning_rate", document.getElementById("learning_rate").value);
+      formData.append("n_estimators", document.getElementById("n_estimators").value);
+      formData.append("test_size", document.getElementById("test_size").value);
+      try {
+        const res = await fetch(`${API_BASE}/train`, { method: "POST", headers: { "Authorization": localStorage.getItem("token") }, body: formData });
+        if (!res.ok) throw new Error();
+        const blob = await res.blob(); const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a"); a.href = url; a.download = "trained_model_results.csv"; a.click();
+        document.getElementById("trainMsg").innerHTML = `<div class="alert alert-success">Model trained successfully</div>`;
+      } catch (err) {
+        document.getElementById("trainMsg").innerHTML = `<div class="alert alert-danger">Training failed</div>`;
+      }
+    };
+
+    function logout() { localStorage.clear(); window.location.href = "index.html"; }
+  </script>
+</body>
+
+</html>
