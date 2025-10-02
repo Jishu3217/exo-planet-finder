@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>EXO Planet Finder - Citizen Scientist</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: #f4f6f9;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .sidebar {
+      width: 250px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      background: #212529;
+      color: white;
+      padding: 15px;
+      overflow-y: auto;
+    }
+
+    .sidebar h4 {
+      margin-bottom: 20px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .sidebar .nav-link {
+      color: #ddd;
+      margin: 5px 0;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+
+    .sidebar .nav-link:hover {
+      background: #495057;
+      color: #fff;
+    }
+
+    .main {
+      margin-left: 250px;
+      padding: 20px;
+    }
+
+    .navbar-custom {
+      background: #fff;
+      border-bottom: 1px solid #ddd;
+      padding: 10px 20px;
+    }
+
+    .chat-box {
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      height: 450px;
+      overflow-y: auto;
+    }
+
+    .chat-message {
+      margin: 10px 0;
+      padding: 10px 15px;
+      border-radius: 12px;
+      max-width: 75%;
+    }
+
+    .user-message {
+      background: #0d6efd;
+      color: #fff;
+      margin-left: auto;
+      text-align: right;
+    }
+
+    .bot-message {
+      background: #e9ecef;
+      color: #000;
+      margin-right: auto;
+    }
+
+    .input-area {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-voice.active {
+      background-color: red !important;
+      color: #fff !important;
+    }
+
+    .upload-box {
+      margin-top: 25px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h4>🚀 EXO Finder</h4>
+    <ul class="nav flex-column">
+      <li class="nav-item"><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+      <li class="nav-item"><a href="citizen.html" class="nav-link active">Citizen Scientist</a></li>
+      <li class="nav-item"><a href="researcher.html" class="nav-link">Researcher</a></li>
+      <li class="nav-item"><a href="password-update.html" class="nav-link">Password Update</a></li>
+      <li class="nav-item"><a href="#" class="nav-link text-danger" onclick="logout()">Logout</a></li>
+    </ul>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <!-- Navbar -->
+    <nav class="navbar navbar-custom d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">EXO Planet Finder - Citizen Scientist</h5>
+      <div>
+        <span id="navbar-username" class="me-3 text-muted"></span>
+        <button class="btn btn-sm btn-outline-danger" onclick="logout()">Logout</button>
+      </div>
+    </nav>
+
+    <!-- Chatbot Section -->
+    <div class="container mt-4">
+      <div class="chat-box" id="chatBox"></div>
+      <div class="input-area">
+        <input type="text" id="chatInput" class="form-control" placeholder="Type your message...">
+        <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+        <button class="btn btn-outline-secondary btn-voice" id="voiceBtn" onclick="toggleVoice()">🎤</button>
+      </div>
+    </div>
+
+    <!-- CSV Upload Section -->
+    <div class="container mt-4">
+      <div class="upload-box">
+        <h5>📂 Upload CSV File</h5>
+        <form id="csvForm" class="d-flex gap-2">
+          <input type="file" id="csvFile" class="form-control" accept=".csv" required>
+          <button type="submit" class="btn btn-warning">Upload</button>
+        </form>
+        <div id="csvMsg" class="mt-2"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    //Auth Check
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) window.location.href = "index.html";
+    document.getElementById("navbar-username").innerText = user.name;
+
+    const API_BASE = "http://localhost:5000/citizen"; // backend citizen API route
+    const chatBox = document.getElementById("chatBox");
+    const chatInput = document.getElementById("chatInput");
+    let recognition; let listening = false;
+
+    // Append message to chat
+    function appendMessage(text, sender) {
+      const div = document.createElement("div");
+      div.classList.add("chat-message", sender === "user" ? "user-message" : "bot-message");
+      div.innerText = text;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // Send message
+    async function sendMessage() {
+      const msg = chatInput.value.trim();
+      if (!msg) return;
+      appendMessage(msg, "user");
+      chatInput.value = "";
+
+      try {
+        const res = await fetch(`${API_BASE}/chat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": localStorage.getItem("token") },
+          body: JSON.stringify({ message: msg })
+        });
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        appendMessage(data.reply || "🤖 No response", "bot");
+      } catch (err) {
+        appendMessage("Server Error", "bot");
+      }
+    }
+
+    // Voice Typing
+    function toggleVoice() {
+      if (!('webkitSpeechRecognition' in window)) {
+        alert("Voice recognition not supported in this browser.");
+        return;
+      }
+      if (!recognition) {
+        recognition = new webkitSpeechRecognition();
+        recognition.lang = "en-US";
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        recognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          chatInput.value = transcript;
+        };
+        recognition.onerror = () => appendMessage("🎤 Voice recognition error", "bot");
+        recognition.onend = () => {
+          listening = false;
+          document.getElementById("voiceBtn").classList.remove("active");
+        };
+      }
+      if (!listening) {
+        recognition.start();
+        listening = true;
+        document.getElementById("voiceBtn").classList.add("active");
+      } else {
+        recognition.stop();
+        listening = false;
+        document.getElementById("voiceBtn").classList.remove("active");
+      }
+    }
+
+    // CSV Upload
+    document.getElementById("csvForm").onsubmit = async (e) => {
+      e.preventDefault();
+      const file = document.getElementById("csvFile").files[0];
+      if (!file) return;
+      const formData = new FormData(); formData.append("file", file);
+
+      try {
+        const res = await fetch(`${API_BASE}/upload`, {
+          method: "POST", headers: { "Authorization": localStorage.getItem("token") }, body: formData
+        });
+        if (!res.ok) throw new Error();
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url; a.download = "citizen_result.csv"; a.click();
+        document.getElementById("csvMsg").innerHTML = `<div class="alert alert-success">CSV processed successfully</div>`;
+      } catch (err) {
+        document.getElementById("csvMsg").innerHTML = `<div class="alert alert-danger">Upload failed</div>`;
+      }
+    };
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+
+</html>
