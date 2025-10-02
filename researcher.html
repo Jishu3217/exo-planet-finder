@@ -256,7 +256,7 @@
     if (!user) window.location.href = "index.html";
     document.getElementById("navbar-username").innerText = user.name;
 
-    const API_BASE = "http://localhost:5000/researcher";
+    const API_BASE = "https://exo-planet-finder.onrender.com/researcher";
 
     // Input JSON
     document.getElementById("jsonForm").onsubmit = async (e) => {
@@ -313,5 +313,6 @@
     function logout() { localStorage.clear(); window.location.href = "index.html"; }
   </script>
 </body>
+
 
 </html>
