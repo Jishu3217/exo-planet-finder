@@ -43,6 +43,7 @@ app.use("/citizen", citizenRoutes);
 //researcherRoutes
 const researcherRoutes = require("./routes/researcher");
 app.use("/researcher", researcherRoutes);
+
 const cors = require("cors");
 app.use(cors({
     origin: "*"   // চাইলে এখানে আপনার GitHub Pages link নির্দিষ্ট করতে পারেন
