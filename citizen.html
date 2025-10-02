@@ -155,7 +155,7 @@
     if (!user) window.location.href = "index.html";
     document.getElementById("navbar-username").innerText = user.name;
 
-    const API_BASE = "http://localhost:5000/citizen"; // backend citizen API route
+    const API_BASE = "https://exo-planet-finder.onrender.com/citizen"; // backend citizen API route
     const chatBox = document.getElementById("chatBox");
     const chatInput = document.getElementById("chatInput");
     let recognition; let listening = false;
@@ -251,5 +251,6 @@
     }
   </script>
 </body>
+
 
 </html>
